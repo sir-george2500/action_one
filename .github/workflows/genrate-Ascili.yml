@@ -1,4 +1,4 @@
-name: Simple CI Pipeline
+name: Learn Variables and Secrets
 
 on:
   push:
@@ -6,38 +6,31 @@ on:
       - main
 
 jobs:
-  build:
+  show-vars:
     runs-on: ubuntu-latest
+
+    # Set environment variables for the whole job
+    env:
+      GLOBAL_VAR: "Hello from the global level"
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Build step
+      - name: Step with local environment variable
+        env:
+          LOCAL_VAR: "Hi from the step level"
         run: |
-          echo "🔧 Building the project..."
-          mkdir build
-          echo "Build complete!" > build/status.txt
+          echo "🔧 GLOBAL_VAR is: $GLOBAL_VAR"
+          echo "📦 LOCAL_VAR is: $LOCAL_VAR"
 
-  test:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Run tests
+      - name: Using GitHub predefined variables
         run: |
-          echo "✅ Running tests..."
-          echo "All tests passed!"
+          echo "📁 Repository: $GITHUB_REPOSITORY"
+          echo "👤 Actor: $GITHUB_ACTOR"
+          echo "📍 Branch/Ref: $GITHUB_REF"
 
-  deploy:
-    runs-on: ubuntu-latest
-    needs: test
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Deploy step
-        run: |
-          echo "🚀 Deploying the application..."
-          echo "Application deployed successfully!"
+      - name: Using a secret (masked automatically)
+        run: echo "🔐 My secret is $MY_SECRET"
+        env:
+          MY_SECRET: ${{ secrets.MY_SECRET }}
