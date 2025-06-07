@@ -10,11 +10,20 @@ jobs:
       - name: Checkout action
         uses: actions/checkout@v4
 
-      - name: Welcome message
-        run: echo "Hello SirGeorge, this is your first action"
+      - name: Genrate My first Github Action
+        run: | 
+             echo "Hello SirGeorge, this is your first action"
+             ls
+             cat README.md
 
-      - name: List the files
-        run: ls
+      - name: Generate Ascali 
+        run:  cowsay -f dragon "Run for cover, I am a Dragon" >> dragon.txt
 
-      - name: Read the README file
-        run: cat README.md
+
+
+      # - name: List the files
+      #   run: | 
+      #        ls
+
+      # - name: Read the README file
+      #   run: cat README.md
