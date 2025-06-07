@@ -1,19 +1,17 @@
-name: My Workflow with Workflow Timeout
+name: Timeout Failure Example
 
 on: [push]
 
-
 jobs:
-  build:
+  long-task:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - run: echo "Building..."
-        # This job will be canceled if the total workflow time exceeds 10 minutes
+    timeout-minutes: 1  # ⏱ Set job timeout to 1 minute
 
-  test:
-    runs-on: ubuntu-latest
-    needs: build
     steps:
-      - run: echo "Testing..."
-        # This job will also be canceled if the total workflow time exceeds 10 minutes
+      - name: Simulate long-running task
+        run: |
+          echo "This will run too long..."
+          sleep 90  # ⏰ Sleep for 90 seconds — longer than 1-minute timeout
+
+      - name: This step won't be reached
+        run: echo "Finished"
