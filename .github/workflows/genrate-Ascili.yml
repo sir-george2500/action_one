@@ -1,36 +1,23 @@
-name: Learn Variables and Secrets
+name: Scheduled and Manual Job
 
 on:
-  push:
-    branches:
-      - main
+  # Manual trigger button in GitHub UI
+  workflow_dispatch:
+
+  # Cron job that runs every 5 minutes (demo purposes)
+  schedule:
+    - cron: '*/5 * * * *'  # Every 5 minutes (UTC)
 
 jobs:
-  show-vars:
+  demo-job:
     runs-on: ubuntu-latest
 
-    # Set environment variables for the whole job
-    env:
-      GLOBAL_VAR: "Hello from the global level"
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - name: Print welcome message
+        run: echo "👋 This workflow was triggered at $(date -u)"
 
-      - name: Step with local environment variable
-        env:
-          LOCAL_VAR: "Hi from the step level"
+      - name: Show GitHub context
         run: |
-          echo "🔧 GLOBAL_VAR is: $GLOBAL_VAR"
-          echo "📦 LOCAL_VAR is: $LOCAL_VAR"
-
-      - name: Using GitHub predefined variables
-        run: |
-          echo "📁 Repository: $GITHUB_REPOSITORY"
-          echo "👤 Actor: $GITHUB_ACTOR"
-          echo "📍 Branch/Ref: $GITHUB_REF"
-
-      - name: Using a secret (masked automatically)
-        run: echo "🔐 My secret is $MY_SECRET"
-        env:
-          MY_SECRET: ${{ secrets.MY_SECRET }}
+          echo "Actor: $GITHUB_ACTOR"
+          echo "Ref: $GITHUB_REF"
+          echo "Event: $GITHUB_EVENT_NAME"
