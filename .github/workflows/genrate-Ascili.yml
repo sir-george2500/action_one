@@ -1,39 +1,19 @@
-name: Deploy Workflow
+name: My Workflow with Workflow Timeout
 
-on:
-  push:
-    branches:
-      - main
-  workflow_dispatch: # Allows manual triggering of the workflow
+on: [push]
+
 
 jobs:
-  docker:
+  build:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Build Docker image (example)
-        run: echo "Building Docker image..." # Replace with your actual Docker build commands
-        # Add your docker build steps here
+      - run: echo "Building..."
+        # This job will be canceled if the total workflow time exceeds 10 minutes
 
-  deploy:
+  test:
     runs-on: ubuntu-latest
-    needs: docker # This job depends on the 'docker' job completing successfully
-    environment: production # Example of an environment (optional)
-
-    # --- Concurrency Configuration ---
-    concurrency:
-      group: production_deployment # A unique name for your concurrency group
-      cancel-in-progress: true    # If a new run starts, cancel any in-progress runs in this group
-    # -------------------------------
-
+    needs: build
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Simulate long deployment
-        run: |
-          echo "Starting deployment to production..."
-          sleep 600 # Simulates a 10-minute deployment
-          echo "Deployment completed!"
-        # Add your actual deployment steps here
+      - run: echo "Testing..."
+        # This job will also be canceled if the total workflow time exceeds 10 minutes
