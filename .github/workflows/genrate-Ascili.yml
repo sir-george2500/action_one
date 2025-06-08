@@ -7,25 +7,33 @@ on:
   workflow_dispatch:
 
 jobs:
-  # --- BUILD JOB WITH MATRIX STRATEGY AND max-parallel ---
   build:
     runs-on: ${{ matrix.os }}
     strategy:
-      max-parallel: 2  # <--- This limits the number of concurrent jobs
-      fail-fast: true  # Default, but good to be explicit
+      max-parallel: 2
+      fail-fast: true
       matrix:
-        os: [ubuntu-latest, windows-latest]
-        docker_version: ['20.10.x', '23.0.x', '24.0.x']
+        os: [ubuntu-latest, ubuntu-20.04, windows-latest]
+        image: ['hello-world', 'alpine']
+
         exclude:
-          - os: windows-latest
-            docker_version: '24.0.x'
+          - image: alpine
+            os: windows-latest
+
+        include:
+          - image: amd64/alpine
+            os: ubuntu-20.04
 
     steps:
       - uses: actions/checkout@v4
-      - name: Setup Docker (hypothetical)
+
+      - name: Pull and inspect image
         run: |
-          echo "Setting up Docker version ${{ matrix.docker_version }} on ${{ matrix.os }}"
-      - name: Build Docker Image
+          echo "Attempting to pull and inspect image: ${{ matrix.image }} on ${{ matrix.os }}"
+          docker pull ${{ matrix.image }}
+          docker images ${{ matrix.image }}
+
+      - name: Run a container from the image
         run: |
-          echo "Building Docker image on ${{ matrix.os }} with Docker ${{ matrix.docker_version }}"
-          docker build .
+          echo "Running a container from ${{ matrix.image }} on ${{ matrix.os }}"
+          docker run --rm ${{ matrix.image }} sh -c "echo 'Hello from inside ${{ matrix.image }}!'" || docker run --rm ${{ matrix.image }}
