@@ -9,16 +9,16 @@ on:
 jobs:
   # --- BUILD JOB WITH MATRIX STRATEGY AND max-parallel ---
   build:
-    runs-on: ${{ matrix.os }} # Runner OS from matrix
+    runs-on: ${{ matrix.os }}
     strategy:
-      max-parallel: 2 # <--- NEW: Limit matrix jobs to 2 parallel runs
-      fail-fast: true # Default, but good to be explicit
+      max-parallel: 2  # <--- This limits the number of concurrent jobs
+      fail-fast: true  # Default, but good to be explicit
       matrix:
         os: [ubuntu-latest, windows-latest]
-        docker_version: ['20.10.x', '23.0.x', '24.0.x'] # Added another Docker version for more matrix jobs
+        docker_version: ['20.10.x', '23.0.x', '24.0.x']
         exclude:
           - os: windows-latest
-            docker_version: '24.0.x' # Exclude Windows with Docker 24.0.x for example
+            docker_version: '24.0.x'
 
     steps:
       - uses: actions/checkout@v4
