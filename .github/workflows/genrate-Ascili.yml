@@ -1,17 +1,26 @@
-name: Timeout Failure Example
+name: Learning matrix strategic
 
 on: [push]
 
 jobs:
-  long-task:
-    runs-on: ubuntu-latest
-    timeout-minutes: 1  # ⏱ Set job timeout to 1 minute
+  build:
+    runs-on: ${{ matrix.os }} # Use a variable from the matrix
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest] # Define 'os' variable with two values
+        node-version: [14.x, 16.x, 18.x] # Define 'node-version' with three values
+        # You can add more variables here
 
     steps:
-      - name: Simulate long-running task
+      - uses: actions/checkout@v4
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install dependencies and build
         run: |
-          echo "This will run too long..."
-          sleep 90  # ⏰ Sleep for 90 seconds — longer than 1-minute timeout
-
-      - name: This step won't be reached
-        run: echo "Finished"
+          npm ci
+          npm run build
+      - name: Run tests
+        run: npm test
