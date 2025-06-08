@@ -1,26 +1,31 @@
-name: Learning matrix strategic
+name: CI/CD with Matrix Build and Concurrency Deploy
 
-on: [push]
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
 
 jobs:
+  # --- BUILD JOB WITH MATRIX STRATEGY AND max-parallel ---
   build:
-    runs-on: ${{ matrix.os }} # Use a variable from the matrix
-
+    runs-on: ${{ matrix.os }} # Runner OS from matrix
     strategy:
+      max-parallel: 2 # <--- NEW: Limit matrix jobs to 2 parallel runs
+      fail-fast: true # Default, but good to be explicit
       matrix:
-        os: [ubuntu-latest, windows-latest] # Define 'os' variable with two values
-        node-version: [14.x, 16.x, 18.x] # Define 'node-version' with three values
-        # You can add more variables here
+        os: [ubuntu-latest, windows-latest]
+        docker_version: ['20.10.x', '23.0.x', '24.0.x'] # Added another Docker version for more matrix jobs
+        exclude:
+          - os: windows-latest
+            docker_version: '24.0.x' # Exclude Windows with Docker 24.0.x for example
 
     steps:
       - uses: actions/checkout@v4
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix.node-version }}
-      - name: Install dependencies and build
+      - name: Setup Docker (hypothetical)
         run: |
-          npm ci
-          npm run build
-      - name: Run tests
-        run: npm test
+          echo "Setting up Docker version ${{ matrix.docker_version }} on ${{ matrix.os }}"
+      - name: Build Docker Image
+        run: |
+          echo "Building Docker image on ${{ matrix.os }} with Docker ${{ matrix.docker_version }}"
+          docker build .
